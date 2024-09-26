@@ -1,0 +1,11 @@
+[package]
+name = "sinepiac"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { workspace = true, features = ["derive"] }
+sinepiac-driver = {workspace = true}
+codespan-reporting = {workspace = true}
+tracing = {workspace = true}
+tracing-subscriber = {workspace = true, features = ["env-filter"]}

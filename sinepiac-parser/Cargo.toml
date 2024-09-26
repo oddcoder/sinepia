@@ -1,0 +1,13 @@
+[package]
+name = "sinepiac-parser"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+salsa = {workspace = true}
+sinepia-ast = {workspace = true}
+sinepiac-diagnostics = {workspace = true}
+sinepiac-instrument = {workspace = true}
+sinepiac-lexer = {workspace = true}
+sinepiac-span = {workspace = true}
+tracing = {workspace = true}

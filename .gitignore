@@ -1,0 +1,10 @@
+tags
+*.swo
+*.bk
+*.swp
+*.vi
+Cargo.lock
+target
+tarpaulin-report.html
+*.xml
+*.patch

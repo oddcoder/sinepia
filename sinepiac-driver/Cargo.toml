@@ -1,0 +1,12 @@
+[package]
+name = "sinepiac-driver"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+salsa = {workspace = true}
+sinepiac-diagnostics = {workspace = true}
+sinepiac-lexer = {workspace = true}
+sinepiac-parser = {workspace = true}
+sinepiac-span = {workspace = true}
+tracing = {workspace = true}

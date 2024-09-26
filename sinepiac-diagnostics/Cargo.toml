@@ -1,0 +1,9 @@
+[package]
+name = "sinepiac-diagnostics"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+codespan-reporting = {workspace =true}
+salsa = {workspace = true}
+sinepiac-span = {workspace = true}
