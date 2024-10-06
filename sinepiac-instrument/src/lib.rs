@@ -1,6 +1,7 @@
 use quote::quote;
 use syn::{parse_macro_input, ItemFn};
 
+/// Instrumentation function suitable only for the parser
 #[proc_macro_attribute]
 pub fn instrument_parse(
     _: proc_macro::TokenStream,
