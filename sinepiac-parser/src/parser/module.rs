@@ -5,7 +5,7 @@ use sinepiac_diagnostics::{
 };
 use sinepiac_lexer::Token;
 
-const TERMINALS: &[DiagToken] = &[DiagToken::Exists, DiagToken::Forall, DiagToken::Ident];
+const TERMINALS: &[DiagToken] = &[DiagToken::Exists, DiagToken::Forall, DiagToken::Fn];
 
 impl<'db> Parsable<'db> for ModuleItem<'db> {
     #[sinepiac_instrument::instrument_parse]

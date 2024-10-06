@@ -15,7 +15,6 @@ use sinepiac_diagnostics::{
 use sinepiac_lexer::Token;
 
 const TERMINALS: &[DiagToken] = &[DiagToken::Exists, DiagToken::Forall, DiagToken::Ident];
-
 fn parse_expr_side<'db>(ctx: &mut ParserCtx<'db>) -> PResult<Prop<'db>> {
     let mut peakable = ctx.peakable();
     let Some(token) = peakable.next() else {
@@ -25,8 +24,8 @@ fn parse_expr_side<'db>(ctx: &mut ParserCtx<'db>) -> PResult<Prop<'db>> {
         return Err(err.into());
     };
     match token.token(peakable.ctx.db) {
-        Token::BraceOpen => Ok(Prop::Exist(PropExist::parse(ctx)?)),
-        Token::ParenOpen => Ok(Prop::Forall(PropForall::parse(ctx)?)),
+        Token::Exists => Ok(Prop::Exist(PropExist::parse(ctx)?)),
+        Token::Forall => Ok(Prop::Forall(PropForall::parse(ctx)?)),
         Token::Ident => Ok(Prop::Ident(Ident::parse(ctx)?)),
         tok => {
             let src = peakable.ctx.tokens.file(peakable.ctx.db);

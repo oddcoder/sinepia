@@ -29,10 +29,12 @@ impl<'ctx, 'db> Peakable<'ctx, 'db> {
         }
     }
     pub fn expect_one_of(&mut self, tokens: &[DiagToken]) -> Result<SpannedToken<'db>, Diagnostic> {
+        let current = self.pos;
         let Some(token) = self.next() else {
             let src = self.ctx.tokens.file(self.ctx.db);
             let span = src.last_span(self.ctx.db);
             let err = EarlyEof::new(src, tokens, span);
+            self.pos = current;
             return Err(err.into());
         };
         let tok = token.token(self.ctx.db).into();
@@ -42,6 +44,7 @@ impl<'ctx, 'db> Peakable<'ctx, 'db> {
         }
         let src = self.ctx.tokens.file(self.ctx.db);
         let err = UnexpectedToken::new(src, tokens, tok, span);
+        self.pos = current;
         Err(err.into())
     }
 }

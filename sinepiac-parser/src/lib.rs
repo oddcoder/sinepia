@@ -1,6 +1,7 @@
 mod context;
 mod parser;
-
+#[cfg(test)]
+pub mod test;
 pub use context::ParserCtx;
 pub use parser::{PResult, Parsable};
 use salsa::{plumbing::attach, Database};

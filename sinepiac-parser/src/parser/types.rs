@@ -10,3 +10,25 @@ impl<'db> Parsable<'db> for Type<'db> {
         Ok(Self::Ident(ident))
     }
 }
+
+#[cfg(test)]
+mod test {
+    use crate::{test::TestDb, Parsable, ParserCtx};
+    use sinepia_ast::types::Type;
+    use sinepiac_lexer::lex_file;
+    use sinepiac_span::SourceFile;
+    use std::path::PathBuf;
+
+    #[test]
+    fn test_type_parser() {
+        let db = TestDb::default();
+        let source = SourceFile::new(&db, PathBuf::default(), "hello world".to_owned());
+        let tokens = lex_file(&db, source);
+        let mut ctx = ParserCtx::new(&db, tokens);
+        let Type::Ident(ident) = Type::parse(&mut ctx).unwrap();
+        assert_eq!(ident.data(ctx.db), "hello");
+        let Type::Ident(ident) = Type::parse(&mut ctx).unwrap();
+        assert_eq!(ident.data(ctx.db), "world");
+        Type::parse(&mut ctx).err().unwrap();
+    }
+}
