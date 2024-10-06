@@ -24,7 +24,7 @@ pub struct Module<'db> {
 impl<'db> Display for Module<'db> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         salsa::with_attached_database(|db| {
-            write!(f, "Module[\n")?;
+            writeln!(f, "Module[")?;
             let items: Vec<_> = self.items(db).iter().map(|i| format!("{i}")).collect();
             write!(f, "{}]", items.join("\n"))
         })
