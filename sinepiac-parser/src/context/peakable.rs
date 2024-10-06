@@ -21,19 +21,8 @@ impl<'ctx, 'db> Peakable<'ctx, 'db> {
         let toks = self.ctx.tokens.tokens(self.ctx.db);
         while let Some(st) = toks.get(self.pos) {
             match st.token(self.ctx.db) {
-                Token::Space => {
-                    if self.ctx.ws {
-                        break;
-                    } else {
-                        self.pos += 1;
-                    }
-                }
-                Token::Comment => {
-                    if self.ctx.comments {
-                        break;
-                    } else {
-                        self.pos += 1;
-                    }
+                Token::Space | Token::Comment => {
+                    self.pos += 1;
                 }
                 _ => break,
             }
