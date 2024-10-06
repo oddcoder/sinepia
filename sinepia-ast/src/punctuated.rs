@@ -123,6 +123,9 @@ where
     pub fn empty_or_trailing(&self) -> bool {
         self.last.is_none()
     }
+    pub fn trailing(&self) -> bool {
+        !self.inner.is_empty() && self.last.is_none()
+    }
 }
 
 impl<T, P> FromIterator<T> for Punctuated<T, P>

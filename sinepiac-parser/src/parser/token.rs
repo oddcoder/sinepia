@@ -75,3 +75,25 @@ parse_token!(SlashEq);
 parse_token!(Star);
 parse_token!(StarEq);
 parse_token!(While);
+
+#[cfg(test)]
+mod test {
+    use crate::{test::TestDb, Parsable, ParserCtx};
+    use sinepia_ast::token::{Exists, Forall, Star, While};
+    use sinepiac_lexer::lex_file;
+    use sinepiac_span::SourceFile;
+    use std::path::PathBuf;
+
+    #[test]
+    fn test_token_parser() {
+        let db = TestDb::default();
+        let source = SourceFile::new(&db, PathBuf::default(), "∀ ∃ * while".to_owned());
+        let tokens = lex_file(&db, source);
+        let mut ctx = ParserCtx::new(&db, tokens);
+        Forall::parse(&mut ctx).unwrap();
+        Exists::parse(&mut ctx).unwrap();
+        Star::parse(&mut ctx).unwrap();
+        While::parse(&mut ctx).unwrap();
+        While::parse(&mut ctx).err().unwrap();
+    }
+}

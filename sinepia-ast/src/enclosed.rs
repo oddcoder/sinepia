@@ -16,11 +16,7 @@ where
     C: Update + Display,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "Enclosed({}, {}, {}}}",
-            self.open, self.inner, self.close
-        )
+        write!(f, "Enclosed({}, {}, {})", self.open, self.inner, self.close)
     }
 }
 

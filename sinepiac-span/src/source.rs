@@ -14,7 +14,7 @@ impl SourceFile {
     pub fn last_span(&self, db: &dyn Database) -> Span {
         let content: &String = self.content(db);
         let len = content.len() as u32;
-        Span::default().with_lo(len - 1).with_hi(len)
+        Span::default().with_lo(len - 1).with_hi(len - 1)
     }
     pub fn at_span<'a>(&'a self, db: &'a dyn Database, span: Span) -> &'a str {
         let content: &String = self.content(db);
