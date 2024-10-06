@@ -1,5 +1,9 @@
-use crate::Token;
+use crate::{lex_file, Token};
 use logos::Logos;
+use salsa::{Database, Storage};
+use sinepiac_diagnostics::{unknown_token::UnknownToken, Diagnostic};
+use sinepiac_span::{SourceFile, Span};
+use std::path::PathBuf;
 
 #[test]
 fn test_lexer1() {
@@ -274,5 +278,64 @@ fn test_reserved() {
             Token::Space,
             Token::While,
         ]
+    );
+}
+
+#[salsa::db]
+#[derive(Default)]
+pub struct TestDb {
+    storage: Storage<Self>,
+}
+
+#[salsa::db]
+impl Database for TestDb {
+    fn salsa_event(&self, _: &dyn Fn() -> salsa::Event) {}
+}
+
+#[test]
+fn test_salsa() {
+    let db = TestDb::default();
+    let source = SourceFile::new(
+        &db,
+        PathBuf::default(),
+        "hello γ if hello world 5 += σ ergo".to_owned(),
+    );
+    let tokens: Vec<_> = lex_file(&db, source)
+        .tokens(&db)
+        .iter()
+        .map(|st| (st.token(&db), st.span(&db)))
+        .collect();
+
+    assert_eq!(
+        tokens,
+        &[
+            (Token::Ident, Span { lo: 0, hi: 5 }), // hello
+            (Token::Space, Span { lo: 5, hi: 6 }), // space
+            // γ is s is skipped
+            (Token::Space, Span { lo: 8, hi: 9 }),    // space
+            (Token::If, Span { lo: 9, hi: 11 }),      // if
+            (Token::Space, Span { lo: 11, hi: 12 }),  // space
+            (Token::Ident, Span { lo: 12, hi: 17 }),  // hello
+            (Token::Space, Span { lo: 17, hi: 18 }),  // space
+            (Token::Ident, Span { lo: 18, hi: 23 }),  // world
+            (Token::Space, Span { lo: 23, hi: 24 }),  // space
+            (Token::Number, Span { lo: 24, hi: 25 }), // 5
+            (Token::Space, Span { lo: 25, hi: 26 }),  // space
+            (Token::PlusEq, Span { lo: 26, hi: 28 }), // +=
+            (Token::Space, Span { lo: 28, hi: 29 }),  // space
+            // σ is skipped
+            (Token::Space, Span { lo: 31, hi: 32 }), // space
+            (Token::Ergo, Span { lo: 32, hi: 36 })   // ergo
+        ]
+    );
+    let diags: Vec<Diagnostic> = lex_file::accumulated(&db, source);
+    assert_eq!(diags.len(), 2);
+    assert_eq!(
+        diags[0],
+        UnknownToken::new(source, Span { lo: 6, hi: 8 }).into()
+    );
+    assert_eq!(
+        diags[1],
+        UnknownToken::new(source, Span { lo: 29, hi: 31 }).into()
     );
 }
