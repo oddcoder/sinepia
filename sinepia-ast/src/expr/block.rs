@@ -3,8 +3,9 @@ use crate::{
     enclosed::Braced,
     literals::Ident,
     token::{Eq, Let, Semi},
+    AstVisitor, Receiver,
 };
-use salsa::Update;
+use salsa::{Database, Update};
 use std::fmt::Display;
 
 #[salsa::tracked]
@@ -25,6 +26,12 @@ impl<'db> Display for Block<'db> {
             write!(f, "{})", list.join("; "))
         })
         .unwrap_or_else(|| panic!("Allowed to only run inside attach()"))
+    }
+}
+
+impl<'db, DB: Database, Vis: AstVisitor<'db, DB>> Receiver<'db, DB, Vis> for Block<'db> {
+    fn accept(&self, vis: &mut Vis, db: &'db DB) {
+        todo!()
     }
 }
 

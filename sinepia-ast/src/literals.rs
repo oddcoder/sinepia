@@ -1,3 +1,5 @@
+use crate::{AstVisitor, Receiver};
+use salsa::Database;
 use sinepiac_span::Span;
 use std::fmt::Display;
 
@@ -6,6 +8,12 @@ pub struct Ident<'db> {
     #[return_ref]
     pub data: String,
     pub span: Span,
+}
+
+impl<'db, DB: Database, Vis: AstVisitor<'db, DB>> Receiver<'db, DB, Vis> for Ident<'db> {
+    fn accept(&self, vis: &mut Vis, db: &'db DB) {
+        vis.visit_ident(db, *self)
+    }
 }
 
 impl<'db> Display for Ident<'db> {

@@ -1,5 +1,5 @@
-use crate::{functions::ItemFn, logic::HoareTriplet};
-use salsa::Update;
+use crate::{functions::ItemFn, logic::HoareTriplet, AstVisitor, Receiver};
+use salsa::{Database, Update};
 use std::fmt::Display;
 
 #[derive(Update, Clone, Debug)]
@@ -16,6 +16,18 @@ impl<'db> Display for ModuleItem<'db> {
     }
 }
 
+impl<'db, DB: Database, Vis: AstVisitor<'db, DB>> Receiver<'db, DB, Vis> for ModuleItem<'db> {
+    fn accept(&self, visitor: &mut Vis, db: &'db DB) {
+        let cont = visitor.visit_module_item_pre(db, self);
+        match (cont.is_continue(), self) {
+            (true, ModuleItem::Fn(item)) => item.accept(visitor, db),
+            (true, ModuleItem::HoareFn(item)) => item.accept(visitor, db),
+            (false, _) => (),
+        };
+        visitor.visit_module_item_post(db, self)
+    }
+}
+
 #[salsa::tracked]
 pub struct Module<'db> {
     pub items: Vec<ModuleItem<'db>>,
@@ -29,5 +41,18 @@ impl<'db> Display for Module<'db> {
             write!(f, "{}]", items.join("\n"))
         })
         .unwrap_or_else(|| panic!("Allowed to only run inside attach()"))
+    }
+}
+
+impl<'db, DB: Database, Vis: AstVisitor<'db, DB>> Receiver<'db, DB, Vis> for Module<'db> {
+    fn accept(&self, visitor: &mut Vis, db: &'db DB) {
+        let cont = visitor.visit_module_pre(db, *self);
+        if cont.is_continue() {
+            let items = self.items(db);
+            for item in items {
+                item.accept(visitor, db);
+            }
+        }
+        visitor.visit_module_post(db, *self)
     }
 }

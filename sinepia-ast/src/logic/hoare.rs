@@ -1,9 +1,11 @@
-use std::fmt::Display;
-
-use salsa::Update;
-
 use super::Prop;
-use crate::token::{Assuming, Comma, Ergo, Semi};
+use crate::{
+    functions::ItemFn,
+    token::{Assuming, Comma, Ergo, Semi},
+    AstVisitor, Receiver, VisitingStatus,
+};
+use salsa::{Database, Update};
+use std::fmt::Display;
 
 #[derive(Update, Clone, Debug)]
 pub struct HoareTriplet<'db, T: Update> {
@@ -26,5 +28,13 @@ where
             "HoareTriplet{{\nprecondition: {},\ninner: {},\npostcondition: {}}}",
             self.precondition, self.inner, self.post_condition
         )
+    }
+}
+
+impl<'db, DB: Database, Vis: AstVisitor<'db, DB>> Receiver<'db, DB, Vis>
+    for HoareTriplet<'db, ItemFn<'db>>
+{
+    fn accept(&self, vis: &mut Vis, db: &'db DB) {
+        todo!()
     }
 }
