@@ -1,5 +1,7 @@
 use salsa::Update;
 use std::fmt::Display;
+use std::option::Iter as OptionIter;
+use std::slice::Iter as SliceIter;
 
 #[derive(Update, Clone, Debug)]
 pub struct Punctuated<T: Update, P: Update> {
@@ -126,6 +128,13 @@ where
     pub fn trailing(&self) -> bool {
         !self.inner.is_empty() && self.last.is_none()
     }
+    /// Returns an iterator over borrowed syntax tree nodes of type `&T`.
+    pub fn iter<'a>(&'a self) -> PunctIter<'a, T, P> {
+        PunctIter {
+            inner: self.inner.iter(),
+            last: self.last.iter(),
+        }
+    }
 }
 
 impl<T, P> FromIterator<T> for Punctuated<T, P>
@@ -149,5 +158,21 @@ where
         for value in i {
             self.push(value);
         }
+    }
+}
+
+pub struct PunctIter<'a, T, P> {
+    inner: SliceIter<'a, (T, P)>,
+    last: OptionIter<'a, Box<T>>,
+}
+
+impl<'a, T, P> Iterator for PunctIter<'a, T, P> {
+    type Item = &'a T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.inner
+            .next()
+            .map(|pair| &pair.0)
+            .or_else(|| self.last.next().map(|v| &**v))
     }
 }
